@@ -5,7 +5,7 @@ export const chatWithAI = async (messages) => {
   try {
     // 构建请求体
     const requestBody = {
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
