@@ -5,6 +5,15 @@ import {
   MessageCircle, Bell, Plus, Settings
 } from 'lucide-react';
 
+import HealthDashboard from './components/health/HealthDashboard';
+
+import AiDoctor from './components/health/AiDoctor';
+import PetInfoForm from './components/PetInfoForm';
+import Login from './components/Auth/Login';
+import Overview from './components/Overview';
+import DietRecommendation from './components/diet/DietRecommendation';
+import PetSocial from './components/Social/Social';
+
 const App = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -207,9 +216,12 @@ const App = () => {
               <HealthDashboard petInfo={petInfo} />
             </motion.div>
         );
-        // ... 其他页面内容
+      case 'diet':
+        return <DietRecommendation petInfo={petInfo} />;
+      case 'social':
+        return <PetSocial petInfo={petInfo} />;
       default:
-        return null;
+        return <HealthDashboard petInfo={petInfo} />;
     }
   };
 
