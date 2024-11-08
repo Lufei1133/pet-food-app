@@ -1,143 +1,284 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Home,           // Overview - 主页健康监控
-  Heart,          // Diet & Training - 健康饮食训练
-  Stethoscope,    // AI Doctor - 医生咨询 (但我们会用自定义医生图标替代)
-  MessageSquare,  // Social - 社交聊天
-  User           // Profile - 用户信息
+  Activity, Heart, ChefHat, Users,
+  MessageCircle, Bell, Plus, Settings
 } from 'lucide-react';
 
-// 自定义医生图标
-const DoctorIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2a3 3 0 0 0-3 3v2H8a2 2 0 0 0-2 2v2M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1v-2a3 3 0 0 0-3-3h-2"/>
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M12 9v6"/>
-      <path d="M9 12h6"/>
-    </svg>
-);
+import HealthDashboard from './components/health/HealthDashboard';
 
-const BottomNav = ({ activeTab, setActiveTab }) => {
-  const navItems = [
+import AiDoctor from './components/health/AiDoctor';
+import PetInfoForm from './components/PetInfoForm';
+import Login from './components/Auth/Login';
+import Overview from './components/Overview';
+import DietRecommendation from './components/diet/DietRecommendation';
+import PetSocial from './components/Social/Social';
+
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showAiChat, setShowAiChat] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+
+  const [petInfo, setPetInfo] = useState({
+    name: 'Max',
+    type: 'dog',
+    age: 5,
+    weight: 14,
+    breed: 'Golden Retriever',
+    activityLevel: 'moderate',
+    healthIssues: ['Joint problems']
+  });
+
+  // 页面切换动画配置
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    enter: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
+  };
+
+  // 主要导航项
+  const navigationItems = [
+    { id: 'overview', name: 'Overview', icon: Activity },
+    { id: 'health', name: 'Health', icon: Heart },
+    { id: 'diet', name: 'Diet', icon: ChefHat },
+    { id: 'social', name: 'Social', icon: Users }
+  ];
+
+  // 快速操作菜单项
+  const quickActions = [
     {
-      id: 'overview',
-      icon: Home,
-      label: 'Home',
-      color: 'from-teal-400 to-cyan-500',
-      gradient: 'hover:bg-gradient-to-r from-teal-400/10 to-cyan-500/10'
+      id: 'chat',
+      name: 'AI Chat',
+      icon: MessageCircle,
+      action: () => setShowAiChat(true)
     },
     {
-      id: 'health',
-      icon: Heart,
-      label: 'Health',
-      color: 'from-red-400 to-pink-500',
-      gradient: 'hover:bg-gradient-to-r from-red-400/10 to-pink-500/10'
-    },
-    {
-      id: 'ai-doctor',
-      icon: DoctorIcon,
-      label: 'Doctor',
-      color: 'from-violet-500 to-purple-600',
-      gradient: 'hover:bg-gradient-to-r from-violet-500/10 to-purple-600/10'
-    },
-    {
-      id: 'social',
-      icon: MessageSquare,
-      label: 'Chat',
-      color: 'from-blue-400 to-indigo-500',
-      gradient: 'hover:bg-gradient-to-r from-blue-400/10 to-indigo-500/10'
-    },
-    {
-      id: 'profile',
-      icon: User,
-      label: 'Profile',
-      color: 'from-gray-400 to-gray-600',
-      gradient: 'hover:bg-gradient-to-r from-gray-400/10 to-gray-600/10'
+      id: 'editPet',
+      name: 'Edit Pet',
+      icon: Settings,
+      action: () => setShowEditForm(true)
     }
   ];
 
-  return (
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl backdrop-blur-lg border border-gray-200 dark:border-gray-700">
-        <div className="px-3 h-16 flex items-center justify-around">
-          {navItems.map((item) => (
-              <motion.button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`relative p-3 rounded-xl transition-all duration-300 ${item.gradient}`}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-              >
-                {item.id === activeTab && (
-                    <motion.div
-                        layoutId="nav-background"
-                        className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} opacity-20`}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                )}
+  // 底部导航组件
+  const BottomNav = () => {
+    const [showQuickActions, setShowQuickActions] = useState(false);
 
-                {/* AI Doctor 特殊处理 */}
-                {item.id === 'ai-doctor' ? (
-                    <div className={`relative rounded-xl p-2.5 bg-gradient-to-r ${item.color} shadow-lg -mt-8`}>
-                      <item.icon className={`w-7 h-7 text-white`} />
-                      <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${item.color} blur-lg opacity-50 -z-10`} />
-                      <div className="absolute inset-0 rounded-xl animate-ping bg-purple-400 opacity-20" />
-                    </div>
-                ) : (
-                    <div className="w-6 h-6">
+    return (
+        <>
+          {/* 底部导航栏 */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-lg pb-safe">
+            <div className="max-w-md mx-auto px-6 h-16">
+              <div className="flex items-center justify-around h-full">
+                {navigationItems.map(item => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className="flex flex-col items-center justify-center group"
+                    >
                       <item.icon
-                          className={`w-full h-full ${
+                          className={`w-6 h-6 mb-1 transition-colors duration-200 ${
                               activeTab === item.id
-                                  ? `bg-gradient-to-r ${item.color} bg-clip-text text-transparent`
-                                  : 'text-gray-400 dark:text-gray-500'
+                                  ? 'text-blue-500'
+                                  : 'text-gray-400 group-hover:text-gray-600'
                           }`}
                       />
+                      <span className={`text-xs transition-colors duration-200 ${
+                          activeTab === item.id
+                              ? 'text-blue-500 font-medium'
+                              : 'text-gray-400 group-hover:text-gray-600'
+                      }`}>
+                    {item.name}
+                  </span>
+                    </button>
+                ))}
+
+                {/* 快速操作按钮 */}
+                <button
+                    onClick={() => setShowQuickActions(true)}
+                    className="relative group"
+                >
+                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center -mt-4 shadow-lg transition-transform duration-200 group-hover:scale-105">
+                    <Plus className="w-6 h-6 text-white" />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 快速操作菜单 */}
+          <AnimatePresence>
+            {showQuickActions && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+                    onClick={() => setShowQuickActions(false)}
+                >
+                  <motion.div
+                      initial={{ y: 100 }}
+                      animate={{ y: 0 }}
+                      exit={{ y: 100 }}
+                      className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6"
+                      onClick={e => e.stopPropagation()}
+                  >
+                    <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
+                    <div className="grid grid-cols-4 gap-4">
+                      {quickActions.map(action => (
+                          <button
+                              key={action.id}
+                              onClick={() => {
+                                action.action();
+                                setShowQuickActions(false);
+                              }}
+                              className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                          >
+                            <action.icon className="w-6 h-6 text-gray-600 mb-2" />
+                            <span className="text-sm text-gray-600">{action.name}</span>
+                          </button>
+                      ))}
                     </div>
-                )}
+                  </motion.div>
+                </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+    );
+  };
 
-                {activeTab === item.id && item.id !== 'ai-doctor' && (
-                    <motion.div
-                        className="absolute -bottom-1 left-1/2 w-1 h-1 bg-current rounded-full"
-                        layoutId="nav-dot"
-                    />
-                )}
-              </motion.button>
-          ))}
+  // 主要内容区域
+  const MainContent = () => (
+      <motion.div
+          key={activeTab}
+          initial="initial"
+          animate="enter"
+          exit="exit"
+          variants={pageVariants}
+          transition={{ duration: 0.3 }}
+          className="min-h-screen bg-gray-50 pb-20"
+      >
+        <div className="max-w-md mx-auto px-4 py-6">
+          {/* 页面标题 */}
+          {/*<div className="flex items-center justify-between mb-6">*/}
+          {/*  <h1 className="text-2xl font-bold">*/}
+          {/*    Welcome back, {petInfo.name}!*/}
+          {/*  </h1>*/}
+          {/*  <div className="relative">*/}
+          {/*    <Bell className="w-6 h-6 text-gray-400" />*/}
+          {/*    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">*/}
+          {/*    3*/}
+          {/*  </span>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/* 健康状态卡片 */}
+          {/*<div className="bg-white rounded-2xl shadow-sm p-6 mb-6">*/}
+          {/*  <div className="grid grid-cols-2 gap-4">*/}
+          {/*    <div>*/}
+          {/*      <span className="text-sm text-gray-500">Health Score</span>*/}
+          {/*      <div className="text-3xl font-bold text-green-500 mt-1">95/100</div>*/}
+          {/*    </div>*/}
+          {/*    <div>*/}
+          {/*      <span className="text-sm text-gray-500">Next Check-up</span>*/}
+          {/*      <div className="text-lg font-medium text-gray-900 mt-1">In 7 days</div>*/}
+          {/*    </div>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
+          {/* 动态内容区域 */}
+          <AnimatePresence mode="wait">
+            {renderContent()}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
   );
-};
-
-const App = () => {
-  const [activeTab, setActiveTab] = useState('overview');
 
   const renderContent = () => {
+    // 根据activeTab返回相应的组件
     switch (activeTab) {
       case 'overview':
-        return <div className="p-4"><h1>Overview</h1></div>;
+        return (
+            <motion.div
+                key="overview"
+                variants={pageVariants}
+            >
+              <Overview petInfo={petInfo} />
+            </motion.div>
+        );
       case 'health':
-        return <div className="p-4"><h1>Health</h1></div>;
-      case 'ai-doctor':
-        return <div className="p-4"><h1>AI Doctor</h1></div>;
+        return (
+            <motion.div
+                key="health"
+                variants={pageVariants}
+            >
+              <HealthDashboard petInfo={petInfo} />
+            </motion.div>
+        );
+      case 'diet':
+        return <DietRecommendation petInfo={petInfo} />;
       case 'social':
-        return <div className="p-4"><h1>Social</h1></div>;
-      case 'profile':
-        return <div className="p-4"><h1>Profile</h1></div>;
+        return <PetSocial petInfo={petInfo} />;
       default:
-        return <div className="p-4"><h1>Overview</h1></div>;
+        return <HealthDashboard petInfo={petInfo} />;
     }
   };
 
-  return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="pb-24">
-          {renderContent()}
-        </div>
+  // 如果没有登录，显示登录页面
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
-        <BottomNav
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-        />
+  return (
+      <div className="bg-gray-50 min-h-screen">
+        <MainContent />
+        <BottomNav />
+
+        {/* AI聊天弹窗 */}
+        <AnimatePresence>
+          {showAiChat && (
+              <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 50 }}
+                  className="fixed inset-0 bg-white z-50"
+              >
+                <AiDoctor
+                    petInfo={petInfo}
+                    onClose={() => setShowAiChat(false)}
+                />
+              </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 编辑宠物信息弹窗 */}
+        <AnimatePresence>
+          {showEditForm && (
+              <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              >
+                <motion.div
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "100%" }}
+                    className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl"
+                >
+                  <PetInfoForm
+                      petInfo={petInfo}
+                      onSubmit={(newPetInfo) => {
+                        setPetInfo(newPetInfo);
+                        setShowEditForm(false);
+                      }}
+                      onCancel={() => setShowEditForm(false)}
+                  />
+                </motion.div>
+              </motion.div>
+          )}
+        </AnimatePresence>
       </div>
   );
 };
