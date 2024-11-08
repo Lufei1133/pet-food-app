@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Heart, Activity, Star } from 'lucide-react';
 
 const Overview = ({ petInfo }) => {
-    // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -23,6 +22,19 @@ const Overview = ({ petInfo }) => {
         }
     };
 
+    // Avatar animation
+    const avatarVariants = {
+        hidden: { scale: 0.8, opacity: 0 },
+        visible: {
+            scale: 1,
+            opacity: 1,
+            transition: {
+                type: "spring",
+                duration: 0.8
+            }
+        }
+    };
+
     return (
         <motion.div
             variants={containerVariants}
@@ -30,29 +42,38 @@ const Overview = ({ petInfo }) => {
             animate="visible"
             className="px-4 py-6 space-y-6"
         >
-            {/*/!* Welcome Message *!/*/}
-            {/*<div className="flex items-center justify-between mb-4">*/}
-            {/*    <h1 className="text-2xl font-bold text-gray-900">*/}
-            {/*        Welcome back, {petInfo.name}!*/}
-            {/*    </h1>*/}
-            {/*</div>*/}
+            {/* Welcome Section with Avatar */}
+            <motion.div
+                className="flex flex-col items-center text-center mb-8"
+                variants={itemVariants}
+            >
+                {/* Pet Avatar */}
+                <motion.div
+                    variants={avatarVariants}
+                    className="relative w-32 h-32 mb-6"
+                >
+                    <div className="absolute inset-0 bg-violet-400 rounded-[2rem] shadow-lg flex items-center justify-center">
+                        <div className="relative">
+                            {/* Pet icon - you might want to replace this with an actual SVG or image */}
+                            <span className="text-4xl">🐕</span>
+                        </div>
+                    </div>
+                </motion.div>
 
-            {/*/!* Quick Stats Card *!/*/}
-            {/*<motion.div*/}
-            {/*    variants={itemVariants}*/}
-            {/*    className="bg-white rounded-2xl p-5 mb-4 shadow-sm"*/}
-            {/*>*/}
-            {/*    <div className="grid grid-cols-2 gap-4">*/}
-            {/*        <div>*/}
-            {/*            <span className="text-gray-500 text-sm">Health Score</span>*/}
-            {/*            <div className="text-[40px] font-bold text-green-500 tracking-tight">95/100</div>*/}
-            {/*        </div>*/}
-            {/*        <div>*/}
-            {/*            <span className="text-gray-500 text-sm">Next Check-up</span>*/}
-            {/*            <div className="text-lg font-medium text-gray-900 mt-1">In 7 days</div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</motion.div>*/}
+                {/* Welcome Text */}
+                <motion.h1
+                    variants={itemVariants}
+                    className="text-2xl font-bold text-gray-900 mb-2"
+                >
+                    Hi, I'm {petInfo.name}! ✨
+                </motion.h1>
+                <motion.p
+                    variants={itemVariants}
+                    className="text-gray-600"
+                >
+                    Let's have a pawsome day!
+                </motion.p>
+            </motion.div>
 
             {/* Health Score Card */}
             <motion.div

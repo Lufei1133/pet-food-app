@@ -161,31 +161,31 @@ const App = () => {
       >
         <div className="max-w-md mx-auto px-4 py-6">
           {/* 页面标题 */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">
-              Welcome back, {petInfo.name}!
-            </h1>
-            <div className="relative">
-              <Bell className="w-6 h-6 text-gray-400" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">
-              3
-            </span>
-            </div>
-          </div>
+          {/*<div className="flex items-center justify-between mb-6">*/}
+          {/*  <h1 className="text-2xl font-bold">*/}
+          {/*    Welcome back, {petInfo.name}!*/}
+          {/*  </h1>*/}
+          {/*  <div className="relative">*/}
+          {/*    <Bell className="w-6 h-6 text-gray-400" />*/}
+          {/*    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">*/}
+          {/*    3*/}
+          {/*  </span>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
 
           {/* 健康状态卡片 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm text-gray-500">Health Score</span>
-                <div className="text-3xl font-bold text-green-500 mt-1">95/100</div>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500">Next Check-up</span>
-                <div className="text-lg font-medium text-gray-900 mt-1">In 7 days</div>
-              </div>
-            </div>
-          </div>
+          {/*<div className="bg-white rounded-2xl shadow-sm p-6 mb-6">*/}
+          {/*  <div className="grid grid-cols-2 gap-4">*/}
+          {/*    <div>*/}
+          {/*      <span className="text-sm text-gray-500">Health Score</span>*/}
+          {/*      <div className="text-3xl font-bold text-green-500 mt-1">95/100</div>*/}
+          {/*    </div>*/}
+          {/*    <div>*/}
+          {/*      <span className="text-sm text-gray-500">Next Check-up</span>*/}
+          {/*      <div className="text-lg font-medium text-gray-900 mt-1">In 7 days</div>*/}
+          {/*    </div>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
 
           {/* 动态内容区域 */}
           <AnimatePresence mode="wait">
