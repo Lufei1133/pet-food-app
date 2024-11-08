@@ -36,7 +36,7 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
     { id: 'wellness', label: 'Wellness', icon: Activity },
     { id: 'social', label: 'Social', icon: Users },
     { id: 'shop', label: 'Shop', icon: ShoppingCart },
-    { id: 'analysis', label: 'Analysis', icon: BarChart2 },
+    { id: 'analytics', label: 'Analysis', icon: BarChart2 },
   ];
   const mobileNavGroups = [
     { id: 'overview', name: 'Overview', icon: Activity },
@@ -214,6 +214,12 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
                 <AiRecommendation petInfo={petInfo}/>
               </>
           )}
+          {/* Wellness Tab */}
+          {/*{activeTab === 'wellness' && (*/}
+          {/*    // <>*/}
+          {/*    //   <WellnessMonitoring petInfo={petInfo}/>*/}
+          {/*    // </>*/}
+          {/*)}*/}
 
           {/* Medical Tab */}
           {activeTab === 'medical' && (
