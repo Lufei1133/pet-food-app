@@ -81,7 +81,7 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
   };
 
   return (
-      <div className="max-w-7xl mx-auto  ">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
           {/* Header with Title and Notification */}
           <div className="flex justify-between items-start mb-8">
@@ -103,7 +103,7 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
           </div>
 
           {/* Actions Section */}
-          <div className="flex justify-between items-center ">
+          <div className="flex justify-between items-center mb-8">  {/* 添加 mb-8 设置下边距 */}
             {/* AI Doctor Button */}
             <button
                 onClick={() => setShowAiDoctor(!showAiDoctor)}
@@ -123,32 +123,32 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
             </button>
           </div>
 
-          {/*/!* Navigation Section *!/*/}
-          {/*<div className="relative mt-2">  /!* 添加 mt-2 设置上边距 *!/*/}
+          {/* Navigation Section */}
+          <div className="relative mt-2">  {/* 添加 mt-2 设置上边距 */}
 
-          {/*/!* Navigation Items *!/*/}
-          {/*<div*/}
-          {/*    ref={scrollContainerRef}*/}
-          {/*    className="flex space-x-1 overflow-x-auto scrollbar-hide "*/}
-          {/*    onScroll={checkScrollButtons}*/}
-          {/*>*/}
-          {/*  {navItems.map(item => (*/}
-          {/*      <button*/}
-          {/*          key={item.id}*/}
-          {/*          onClick={() => setActiveTab(item.id)}*/}
-          {/*          className={`flex items-center px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${*/}
-          {/*              activeTab === item.id*/}
-          {/*                  ? 'bg-blue-100 text-blue-600'*/}
-          {/*                  : 'text-gray-600 hover:bg-gray-100'*/}
-          {/*          }`}*/}
-          {/*      >*/}
-          {/*        <item.icon className="h-4 w-4 mr-2"/>*/}
-          {/*        {item.label}*/}
-          {/*      </button>*/}
-          {/*  ))}*/}
-          {/*</div>*/}
+          {/* Navigation Items */}
+          <div
+              ref={scrollContainerRef}
+              className="flex space-x-1 overflow-x-auto scrollbar-hide"
+              onScroll={checkScrollButtons}
+          >
+            {navItems.map(item => (
+                <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex items-center px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                        activeTab === item.id
+                            ? 'bg-blue-100 text-blue-600'
+                            : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                >
+                  <item.icon className="h-4 w-4 mr-2"/>
+                  {item.label}
+                </button>
+            ))}
+          </div>
 
-        {/*</div>*/}
+        </div>
       </div>
 
 
