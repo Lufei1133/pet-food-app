@@ -50,7 +50,7 @@ const WeChatIcon = () => (
     </svg>
 );
 
-const LoginScreen = () => {
+const Login = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -142,7 +142,7 @@ const LoginScreen = () => {
               { icon: FacebookIcon, color: '#1877F2', text: 'Facebook' },
               { icon: WeChatIcon, color: '#07C160', text: 'WeChat' },
               { icon: AppleIcon, color: '#000000', text: 'Apple' }
-            ].map((provider, index) => (
+            ].map((provider) => (
                 <button
                     key={provider.text}
                     type="button"
