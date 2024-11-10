@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-
+import AuthService from '../../services/auth';
 // Social Icons Components (same as before)
 const GoogleIcon = () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5">
@@ -51,119 +52,142 @@ const WeChatIcon = () => (
 );
 
 const Login = () => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
-  };
+    useEffect(() => {
+        if (AuthService.isAuthenticated()) {
+            navigate('/');
+        }
+    }, [navigate]);
 
-  return (
-      <div className="min-h-screen bg-[#f5f5f7] px-6 py-12 flex flex-col">
-        {/* Header Section */}
-        <div className="mb-12 text-center">
-          <h1 className="text-[32px] font-bold text-gray-900 mb-2">Welcome Back</h1>
-          <p className="text-[17px] text-gray-500">Sign in to continue</p>
-        </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError('');
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Input */}
-          <div className="relative">
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-[14px] pl-12 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[17px] text-gray-900 placeholder:text-gray-400"
-            />
-            <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-          </div>
+        try {
+            await AuthService.login(email, password);
+            // 登录成功，跳转到首页
+            navigate('/', { replace: true });
+        } catch (error) {
+            setError(error.message || 'Login failed');
+            setIsLoading(false);
+        }
+    };
 
-          {/* Password Input */}
-          <div className="relative">
-            <input
-                type={isPasswordVisible ? 'text' : 'password'}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-[14px] pl-12 pr-12 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[17px] text-gray-900 placeholder:text-gray-400"
-            />
-            <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-            <button
-                type="button"
-                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                className="absolute right-4 top-4"
-            >
-              {isPasswordVisible ?
-                  <EyeOff className="h-5 w-5 text-gray-400" /> :
-                  <Eye className="h-5 w-5 text-gray-400" />
-              }
-            </button>
-          </div>
+    return (
+        <div className="min-h-screen bg-[#f5f5f7] px-6 py-12 flex flex-col">
+            <div className="mb-12 text-center">
+                <h1 className="text-[32px] font-bold text-gray-900 mb-2">Welcome Back</h1>
+                <p className="text-[17px] text-gray-500">Sign in to continue</p>
+            </div>
 
-          {/* Forgot Password */}
-          <div className="flex justify-end">
-            <button type="button" className="text-[15px] text-blue-500 font-medium hover:text-blue-600">
-              Forgot password?
-            </button>
-          </div>
-
-          {/* Sign In Button */}
-          <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full bg-gray-900 text-white py-[14px] rounded-2xl flex items-center justify-center space-x-2 text-[17px] font-medium transition-all ${
-                  isLoading ? 'opacity-80 cursor-not-allowed' : 'hover:bg-gray-800 active:scale-[0.99]'
-              }`}
-          >
-            <span>Sign In</span>
-            {!isLoading && <ArrowRight className="h-5 w-5" />}
-            {isLoading && (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            {/* Simple Error Display */}
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <p className="text-red-600 text-sm">{error}</p>
+                </div>
             )}
-          </button>
 
-          {/* Divider */}
-          <div className="flex items-center my-8">
-            <div className="flex-1 border-t border-gray-200" />
-            <span className="px-4 text-[15px] text-gray-500">Or continue with</span>
-            <div className="flex-1 border-t border-gray-200" />
-          </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Email Input */}
+                <div className="relative">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-[14px] pl-12 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[17px] text-gray-900 placeholder:text-gray-400"
+                        required
+                    />
+                    <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+                </div>
 
-          {/* Social Login Buttons */}
-          <div className="grid grid-cols-4 gap-4">
-            {[
-              { icon: GoogleIcon, color: '#DB4437', text: 'Google' },
-              { icon: FacebookIcon, color: '#1877F2', text: 'Facebook' },
-              { icon: WeChatIcon, color: '#07C160', text: 'WeChat' },
-              { icon: AppleIcon, color: '#000000', text: 'Apple' }
-            ].map((provider) => (
+                {/* Password Input */}
+                <div className="relative">
+                    <input
+                        type={isPasswordVisible ? 'text' : 'password'}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-4 py-[14px] pl-12 pr-12 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[17px] text-gray-900 placeholder:text-gray-400"
+                        required
+                    />
+                    <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+                    <button
+                        type="button"
+                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                        className="absolute right-4 top-4"
+                    >
+                        {isPasswordVisible ? (
+                            <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                            <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                    </button>
+                </div>
+
+                {/* Forgot Password */}
+                <div className="flex justify-end">
+                    <button type="button" className="text-[15px] text-blue-500 font-medium hover:text-blue-600">
+                        Forgot password?
+                    </button>
+                </div>
+
+                {/* Sign In Button */}
                 <button
-                    key={provider.text}
-                    type="button"
-                    className="group relative flex items-center justify-center aspect-square bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 hover:border-gray-300/50 transition-all"
+                    type="submit"
+                    disabled={isLoading}
+                    className={`w-full bg-gray-900 text-white py-[14px] rounded-2xl flex items-center justify-center space-x-2 text-[17px] font-medium transition-all ${
+                        isLoading ? 'opacity-80 cursor-not-allowed' : 'hover:bg-gray-800 active:scale-[0.99]'
+                    }`}
                 >
-                  <div className={`text-[${provider.color}]`}>
-                    <provider.icon />
-                  </div>
+                    <span>Sign In</span>
+                    {!isLoading && <ArrowRight className="h-5 w-5" />}
+                    {isLoading && (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    )}
                 </button>
-            ))}
-          </div>
-        </form>
 
-        {/* Sign Up Prompt */}
-        <p className="mt-8 text-center text-[15px] text-gray-600">
-          Don't have an account?{' '}
-          <button className="text-blue-500 font-medium hover:text-blue-600">
-            Sign up now
-          </button>
-        </p>
-      </div>
+                {/* Social Login */}
+                <div className="flex items-center my-8">
+                    <div className="flex-1 border-t border-gray-200" />
+                    <span className="px-4 text-[15px] text-gray-500">Or continue with</span>
+                    <div className="flex-1 border-t border-gray-200" />
+                </div>
+
+                {/* Social Buttons */}
+                <div className="grid grid-cols-4 gap-4">
+                    {[
+                        { icon: GoogleIcon, text: 'Google' },
+                        { icon: FacebookIcon, text: 'Facebook' },
+                        { icon: WeChatIcon, text: 'WeChat' },
+                        { icon: AppleIcon, text: 'Apple' }
+                    ].map((provider) => (
+                        <button
+                            key={provider.text}
+                            type="button"
+                            className="group relative flex items-center justify-center aspect-square bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-200/50 hover:border-gray-300/50 transition-all"
+                        >
+                            <provider.icon />
+                        </button>
+                    ))}
+                </div>
+
+                {/* Sign Up Link */}
+                <p className="mt-8 text-center text-[15px] text-gray-600">
+                    Don't have an account?{' '}
+                    <button className="text-blue-500 font-medium hover:text-blue-600">
+                        Sign up now
+                    </button>
+                </p>
+            </form>
+        </div>
   );
 };
 

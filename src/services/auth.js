@@ -1,34 +1,49 @@
 // src/services/auth.js
 import axios from 'axios';
+import { encryptSM4 } from './encryption';
 
-const API_URL = 'http://localhost:3001/api'; // 替换为实际的API地址
+const API_URL = 'https://jerry.macz.cloud/api';
+
+// 定义路由路径
+export const ROUTES = {
+  LOGIN: '/login',
+  HOME: '/'
+};
 
 const AuthService = {
   async login(email, password) {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password
-      });
-      if (response.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-      }
-      return response.data;
-    } catch (error) {
-      throw error.response.data;
-    }
-  },
+      const encryptedPassword = await encryptSM4(password);
 
-  async register(username, email, password) {
-    try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        username,
+      const response = await axios.post(`${API_URL}/user/login`, {
         email,
-        password
+        password: encryptedPassword
       });
-      return response.data;
+
+      if (response.status === 200) {
+        if (response.data.ok) {
+          // 登录成功，保存用户信息
+          const userData = {
+            token: response.data.data.token,
+            email: response.data.data.email
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          return response.data;
+        } else {
+          throw new Error(response.data.msg);
+        }
+      } else {
+        throw new Error('Server is busy, please try again later');
+      }
     } catch (error) {
-      throw error.response.data;
+      console.error('Login error:', error);
+      if (error.response) {
+        throw new Error('Server is busy, please try again later');
+      } else if (error.message) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('Server is busy, please try again later');
+      }
     }
   },
 
@@ -37,12 +52,13 @@ const AuthService = {
   },
 
   getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
   },
 
-  getAuthHeader() {
+  isAuthenticated() {
     const user = this.getCurrentUser();
-    return user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+    return !!user?.token;
   }
 };
 

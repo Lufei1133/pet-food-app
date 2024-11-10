@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Activity, Heart, ChefHat, Users,
   MessageCircle, Bell, Plus, Settings
 } from 'lucide-react';
+import AuthService from './services/auth';
 
 import HealthDashboard from './components/health/HealthDashboard';
-
 import AiDoctor from './components/health/AiDoctor';
 import PetInfoForm from './components/PetInfoForm';
-import Login from './components/Auth/Login';
 import Overview from './components/Overview';
 import DietRecommendation from './components/diet/DietRecommendation';
 import PetSocial from './components/Social/Social';
 
 const App = () => {
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [showAiChat, setShowAiChat] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+
+  // 从 AuthService 获取用户信息
+  const [user, setUser] = useState(AuthService.getCurrentUser());
+
+  // 检查认证状态
+  useEffect(() => {
+    if (!AuthService.isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
+  }, [navigate]);
 
   const [petInfo, setPetInfo] = useState({
     name: 'Max',
@@ -29,6 +40,12 @@ const App = () => {
     activityLevel: 'moderate',
     healthIssues: ['Joint problems']
   });
+
+  // 处理登出
+  const handleLogout = () => {
+    AuthService.logout();
+    navigate('/login');
+  };
 
   // 页面切换动画配置
   const pageVariants = {
@@ -160,32 +177,18 @@ const App = () => {
           className="min-h-screen bg-gray-50 pb-20"
       >
         <div className="max-w-md mx-auto px-4 py-6">
-          {/* 页面标题 */}
-          {/*<div className="flex items-center justify-between mb-6">*/}
-          {/*  <h1 className="text-2xl font-bold">*/}
-          {/*    Welcome back, {petInfo.name}!*/}
-          {/*  </h1>*/}
-          {/*  <div className="relative">*/}
-          {/*    <Bell className="w-6 h-6 text-gray-400" />*/}
-          {/*    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">*/}
-          {/*    3*/}
-          {/*  </span>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
-
-          {/* 健康状态卡片 */}
-          {/*<div className="bg-white rounded-2xl shadow-sm p-6 mb-6">*/}
-          {/*  <div className="grid grid-cols-2 gap-4">*/}
-          {/*    <div>*/}
-          {/*      <span className="text-sm text-gray-500">Health Score</span>*/}
-          {/*      <div className="text-3xl font-bold text-green-500 mt-1">95/100</div>*/}
-          {/*    </div>*/}
-          {/*    <div>*/}
-          {/*      <span className="text-sm text-gray-500">Next Check-up</span>*/}
-          {/*      <div className="text-lg font-medium text-gray-900 mt-1">In 7 days</div>*/}
-          {/*    </div>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
+          {/* 添加顶部栏，包含用户邮箱和登出按钮 */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-sm text-gray-600">
+              {user?.email}
+            </div>
+            <button
+                onClick={handleLogout}
+                className="text-sm text-red-500 hover:text-red-600"
+            >
+              Logout
+            </button>
+          </div>
 
           {/* 动态内容区域 */}
           <AnimatePresence mode="wait">
@@ -225,10 +228,8 @@ const App = () => {
     }
   };
 
-  // 如果没有登录，显示登录页面
-  if (!user) {
-    return <Login onLogin={setUser} />;
-  }
+
+
 
   return (
       <div className="bg-gray-50 min-h-screen">
