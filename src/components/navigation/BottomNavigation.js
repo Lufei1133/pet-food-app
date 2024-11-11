@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    Activity, Heart, ChefHat, Users, Settings,
+    Activity, Heart, Users, Settings,
     MessageCircle, Bell, Plus
 } from 'lucide-react';
 
@@ -8,16 +8,13 @@ const BottomNavigation = ({ currentTab, onChangeTab, onOpenChat, notifications =
     const [showMore, setShowMore] = useState(false);
 
     const mainTabs = [
-        { id: 'overview', name: 'Overview', icon: Activity },
+        { id: 'Shop', name: 'Shop', icon: Activity },
         { id: 'health', name: 'Health', icon: Heart },
-        { id: 'diet', name: 'Diet', icon: ChefHat },
-        { id: 'social', name: 'Social', icon: Users }
+        { id: 'chat', name: 'AI Chat', icon: MessageCircle },
+        { id: 'social', name: 'Social', icon: Users },
+        { id: 'Profile', name: 'Profile', icon: Settings }
     ];
 
-    const moreActions = [
-        { id: 'chat', name: 'AI Chat', icon: MessageCircle, action: onOpenChat },
-        { id: 'settings', name: 'Settings', icon: Settings }
-    ];
 
     return (
         <>
