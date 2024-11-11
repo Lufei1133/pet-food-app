@@ -10,8 +10,6 @@ import AuthService from './services/auth';
 import HealthDashboard from './components/health/HealthDashboard';
 import AiDoctor from './components/AI-Vet/AiDoctor';
 import PetInfoForm from './components/profile/PetInfoForm';
-import Overview from './components/Overview';
-import DietRecommendation from './components/health/DietRecommendation';
 import PetSocial from './components/Social/Social';
 
 const App = () => {
