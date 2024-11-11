@@ -3,8 +3,8 @@ import {
   Layout, Activity, ChefHat, Heart, Settings 
 } from 'lucide-react';
 import HealthDashboard from './health/HealthDashboard';
-import DietRecommendation from './diet/DietRecommendation';
-import ExercisePlan from './exercise/ExercisePlan';
+import DietRecommendation from './health/DietRecommendation';
+import ExercisePlan from './health/ExercisePlan';
 
 const Dashboard = ({ petInfo }) => {
   const [activeTab, setActiveTab] = useState('health');

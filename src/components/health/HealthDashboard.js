@@ -9,17 +9,17 @@ import {
 
 import HealthMonitoring from './HealthMonitoring';
 import AiRecommendation from './AiRecommendation';
-import DietRecommendation from '../diet/DietRecommendation';
+import DietRecommendation from './DietRecommendation';
 import HealthRecords from './HealthRecords';
-import AiDoctor from './AiDoctor';
+import AiDoctor from '../AI-Vet/AiDoctor';
 import Appointments from './Appointments';
 import PetSocial from '../Social/Social';
 import ExpenseTracker from '../Finance/Finance';
 import PetShop from '../shop/PetShop';
-import ExercisePlan from '../exercise/ExercisePlan';
+import ExercisePlan from './ExercisePlan';
 import MedicalCenter from '../medical/MedicalCenter';
 import TrainingPlan from '../training/TrainingPlan';
-import Analytics from '../analytics/Analytics'; // 新增分析组件导入
+import Analytics from './Analytics'; // 新增分析组件导入
 
 const HealthDashboard = ({ petInfo, onEdit }) => {
   const [showNotifications, setShowNotifications] = useState(false);
