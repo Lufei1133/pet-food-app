@@ -14,7 +14,6 @@ import HealthRecords from './HealthRecords';
 import AiDoctor from '../AI-Vet/AiDoctor';
 import Appointments from './Appointments';
 import PetSocial from '../Social/Social';
-import ExpenseTracker from '../Finance/Finance';
 import PetShop from '../shop/PetShop';
 import ExercisePlan from './ExercisePlan';
 import MedicalCenter from '../medical/MedicalCenter';
@@ -261,16 +260,12 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
               <PetShop petInfo={petInfo}/>
           )}
 
-          {/* Expenses Tab */}
-          {activeTab === 'expenses' && (
-              <ExpenseTracker petInfo={petInfo}/>
-          )}
+
 
           {/* Records Tab */}
           {activeTab === 'records' && (
               <div className="space-y-6">
                 <HealthRecords petInfo={petInfo}/>
-                <ExpenseTracker petInfo={petInfo}/>
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold">Analytics Report</h2>
