@@ -30,18 +30,10 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
   const [showRightScroll, setShowRightScroll] = useState(true);
 
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'health', label: 'Health', icon: Heart },
-    { id: 'wellness', label: 'Wellness', icon: Activity },
-    { id: 'social', label: 'Social', icon: Users },
-    { id: 'shop', label: 'Shop', icon: ShoppingCart },
-    { id: 'analytics', label: 'Analysis', icon: BarChart2 },
   ];
   const mobileNavGroups = [
-    { id: 'overview', name: 'Overview', icon: Activity },
     { id: 'health', name: 'Health', icon: Heart },
-    { id: 'social', name: 'Social', icon: Users },
-    { id: 'shop', name: 'Shop', icon: ShoppingCart }
   ];
   // 处理导航点击
   const handleNavClick = (itemId) => {
@@ -213,12 +205,6 @@ const HealthDashboard = ({ petInfo, onEdit }) => {
                 <AiRecommendation petInfo={petInfo}/>
               </>
           )}
-          {/* Wellness Tab */}
-          {/*{activeTab === 'wellness' && (*/}
-          {/*    // <>*/}
-          {/*    //   <WellnessMonitoring petInfo={petInfo}/>*/}
-          {/*    // </>*/}
-          {/*)}*/}
 
           {/* Medical Tab */}
           {activeTab === 'medical' && (
