@@ -1,16 +1,27 @@
 // src/components/Auth/ProtectedRoute.js
-import { Navigate } from 'react-router-dom';
+import {Navigate, useLocation, useNavigate} from 'react-router-dom';
 import AuthService, { ROUTES } from '../../services/auth';
+import {useEffect} from "react";
 
+// src/components/Auth/ProtectedRoute.js
 const ProtectedRoute = ({ children }) => {
-    const user = AuthService.getCurrentUser();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    if (!user?.token) {
-        // 用户未登录，重定向到登录页
-        return <Navigate to={ROUTES.LOGIN} replace />;
-    }
+    useEffect(() => {
+        const isAuth = AuthService.isAuthenticated();
+        console.log('ProtectedRoute check:', isAuth);  // 添加调试日志
 
-    return children;
+        if (!isAuth) {
+            console.log('Redirecting to login...');  // 添加调试日志
+            navigate('/login', {
+                replace: true,
+                state: { from: location }
+            });
+        }
+    }, [navigate, location]);
+
+    return AuthService.isAuthenticated() ? children : null;
 };
 
 export default ProtectedRoute;

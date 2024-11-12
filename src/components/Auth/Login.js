@@ -1,3 +1,4 @@
+// ./src/components/Auth/Login.js
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
@@ -59,9 +60,10 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // 检查是否已登录
     useEffect(() => {
         if (AuthService.isAuthenticated()) {
-            navigate('/');
+            navigate('/', { replace: true });
         }
     }, [navigate]);
 
@@ -71,11 +73,14 @@ const Login = () => {
         setError('');
 
         try {
-            await AuthService.login(email, password);
-            // 登录成功，跳转到首页
-            navigate('/', { replace: true });
+            const response = await AuthService.login(email, password);
+            // response 直接就是 AuthService.login 返回的数据，不需要 .data
+            if (response.ok) {  // 移除 .data
+                navigate('/', { replace: true });
+            }
         } catch (error) {
             setError(error.message || 'Login failed');
+        } finally {
             setIsLoading(false);
         }
     };
