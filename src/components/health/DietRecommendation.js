@@ -1,232 +1,243 @@
 import React, { useState } from 'react';
-import { ChefHat, Apple, Info, AlertTriangle } from 'lucide-react';
+import {
+  Apple, ChevronLeft, Coffee, Utensils,
+  Moon, Edit, CheckCircle, Plus, X
+} from 'lucide-react';
 
-const DietRecommendation = ({ petInfo }) => {
-  const [selectedMeal, setSelectedMeal] = useState(null);
-
-  // 基于宠物信息生成膳食建议
-  const generateDietPlan = () => {
-    const basedOnWeight = petInfo.weight * 30; // 基础卡路里需求
-    const activityMultiplier = {
-      low: 1.2,
-      moderate: 1.4,
-      high: 1.6
-    }[petInfo.activityLevel];
-
-    const dailyCalories = Math.round(basedOnWeight * activityMultiplier);
-
-    const meals = [
-      {
-        name: "Morning Meal",
-        calories: Math.round(dailyCalories * 0.4),
-        time: "7:00 AM",
-        ingredients: [
-          { name: "Lean Protein", amount: "100g" },
-          { name: "Complex Carbs", amount: "50g" },
-          { name: "Vegetables", amount: "30g" }
-        ],
-        notes: "Rich in protein for morning energy"
-      },
-      {
-        name: "Afternoon Snack",
-        calories: Math.round(dailyCalories * 0.2),
-        time: "2:00 PM",
-        ingredients: [
-          { name: "Healthy Treats", amount: "30g" },
-          { name: "Fresh Fruits", amount: "20g" }
-        ],
-        notes: "Light and nutritious"
-      },
-      {
-        name: "Evening Meal",
-        calories: Math.round(dailyCalories * 0.4),
-        time: "6:00 PM",
-        ingredients: [
-          { name: "Mixed Protein", amount: "100g" },
-          { name: "Whole Grains", amount: "50g" },
-          { name: "Mixed Vegetables", amount: "40g" }
-        ],
-        notes: "Balanced dinner for good sleep"
-      }
-    ];
-
-    // 根据健康问题调整建议
-    if (petInfo.healthIssues.includes('Weight management')) {
-      meals.forEach(meal => {
-        meal.calories = Math.round(meal.calories * 0.9);
-        meal.notes += " (Portion reduced for weight management)";
-      });
+const DietRecommendation = ({ petInfo, onBack }) => {
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [mealPlan, setMealPlan] = useState([
+    {
+      id: 1,
+      type: 'Breakfast',
+      icon: Coffee,
+      color: 'amber',
+      meal: 'Whole grain bread with eggs and vegetables',
+      completed: false
+    },
+    {
+      id: 2,
+      type: 'Lunch',
+      icon: Utensils,
+      color: 'emerald',
+      meal: 'Mixed salad with grilled chicken breast',
+      completed: false
+    },
+    {
+      id: 3,
+      type: 'Dinner',
+      icon: Utensils,
+      color: 'blue',
+      meal: 'Grilled fish with quinoa and steamed vegetables',
+      completed: false
+    },
+    {
+      id: 4,
+      type: 'Snack',
+      icon: Apple,
+      color: 'rose',
+      meal: 'A piece of fruit or a handful of nuts',
+      completed: false
     }
+  ]);
 
-    return {
-      dailyCalories,
-      meals
-    };
+  // 计算进度
+  const progress =
+      (mealPlan.filter(meal => meal.completed).length / mealPlan.length) * 100;
+
+  // 切换完成状态
+  const toggleComplete = (id) => {
+    setMealPlan(mealPlan.map(meal =>
+        meal.id === id ? { ...meal, completed: !meal.completed } : meal
+    ));
   };
 
-  const dietPlan = generateDietPlan();
+  // 修改餐点内容
+  const handleEdit = (meal) => {
+    setEditingMeal({ ...meal });
+  };
 
+  // 保存修改
+  const handleSave = () => {
+    if (editingMeal) {
+      setMealPlan(mealPlan.map(meal =>
+          meal.id === editingMeal.id ? editingMeal : meal
+      ));
+      setEditingMeal(null);
+    }
+  };
+
+  // 餐点卡片组件
   const MealCard = ({ meal }) => (
-    <div 
-      className={`bg-white rounded-xl shadow-sm p-6 cursor-pointer transition-all ${
-        selectedMeal?.name === meal.name ? 'ring-2 ring-blue-500' : 'hover:shadow-md'
-      }`}
-      onClick={() => setSelectedMeal(meal)}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{meal.name}</h3>
-        <span className="text-sm text-gray-500">{meal.time}</span>
-      </div>
-      <div className="space-y-2">
-        <div className="text-2xl font-bold text-blue-600">
-          {meal.calories} kcal
+      <div className="bg-white border-2 border-gray-100 p-4 rounded-xl mb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center flex-1">
+            <button
+                onClick={() => toggleComplete(meal.id)}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
+              ${meal.completed
+                    ? `bg-${meal.color}-500 border-${meal.color}-500`
+                    : `border-${meal.color}-500`
+                }`}
+            >
+              {meal.completed && (
+                  <CheckCircle className="w-4 h-4 text-white" />
+              )}
+            </button>
+
+            <div className="ml-3 flex-1">
+              <div className="flex items-center">
+                <meal.icon className={`w-5 h-5 mr-2 text-${meal.color}-500`} />
+                <h3 className="font-medium text-gray-900">
+                  {meal.type}:
+                </h3>
+              </div>
+              <p className="text-gray-600 mt-1">{meal.meal}</p>
+            </div>
+          </div>
+
+          <button
+              onClick={() => handleEdit(meal)}
+              className={`p-2 rounded-full hover:bg-${meal.color}-50`}
+          >
+            <Edit className={`w-4 h-4 text-${meal.color}-500`} />
+          </button>
         </div>
-        <div className="text-sm text-gray-500">{meal.notes}</div>
       </div>
-    </div>
+  );
+
+  // 编辑表单组件
+  const EditForm = () => (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Edit Meal</h3>
+            <button onClick={() => setEditingMeal(null)}>
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Meal Type</label>
+              <input
+                  type="text"
+                  value={editingMeal?.type || ''}
+                  onChange={e => setEditingMeal({
+                    ...editingMeal,
+                    type: e.target.value
+                  })}
+                  className="mt-1 block w-full rounded-xl border border-gray-300 p-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                  value={editingMeal?.meal || ''}
+                  onChange={e => setEditingMeal({
+                    ...editingMeal,
+                    meal: e.target.value
+                  })}
+                  className="mt-1 block w-full rounded-xl border border-gray-300 p-2"
+                  rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                  onClick={() => setEditingMeal(null)}
+                  className="px-4 py-2 rounded-xl border text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
   );
 
   return (
-    <div className="space-y-6">
-      {/* 每日卡路里概览 */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <ChefHat className="h-6 w-6 text-blue-500 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">
-              Daily Nutrition Plan
-            </h2>
+      <div className="max-w-2xl mx-auto p-4">
+        {/* Back button */}
+        <button
+            onClick={onBack}
+            className="flex items-center text-gray-600 mb-6 hover:text-gray-800"
+        >
+          <ChevronLeft className="w-5 h-5 mr-1" />
+          Back to Dashboard
+        </button>
+
+        {/* Header Card with Progress */}
+        <div className="bg-gradient-to-r from-green-400 to-blue-400 rounded-3xl p-6 mb-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Apple className="w-6 h-6 text-white" />
+              </div>
+              <div className="ml-4">
+                <h1 className="text-2xl font-bold">Diet Recommendation</h1>
+                <p className="text-white/80">Your personalized nutrition guide</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold">{Math.round(progress)}%</div>
+              <p className="text-white/80">Completed</p>
+            </div>
           </div>
-          <div className="text-sm text-gray-500">
-            Based on {petInfo.name}'s profile
+
+          {/* Progress Bar */}
+          <div className="mt-4 bg-white/20 rounded-full h-2">
+            <div
+                className="bg-white h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="text-sm text-blue-600 mb-1">Daily Calories</div>
-            <div className="text-2xl font-bold text-blue-700">
-              {dietPlan.dailyCalories} kcal
-            </div>
-          </div>
-          <div className="bg-green-50 rounded-lg p-4">
-            <div className="text-sm text-green-600 mb-1">Meals</div>
-            <div className="text-2xl font-bold text-green-700">
-              {dietPlan.meals.length} per day
-            </div>
-          </div>
-          <div className="bg-orange-50 rounded-lg p-4">
-            <div className="text-sm text-orange-600 mb-1">Water</div>
-            <div className="text-2xl font-bold text-orange-700">
-              {Math.round(petInfo.weight * 60)} ml
-            </div>
+        {/* Daily Meal Plan */}
+        <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden mb-6">
+          <h2 className="text-xl font-semibold text-green-500 p-6 pb-4">
+            Daily Meal Plan
+          </h2>
+          <div className="p-4">
+            {mealPlan.map(meal => (
+                <MealCard key={meal.id} meal={meal} />
+            ))}
           </div>
         </div>
 
-        {/* 注意事项 */}
-        {petInfo.healthIssues.length > 0 && (
-          <div className="flex items-start p-4 bg-yellow-50 rounded-lg mb-6">
-            <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
-            <div className="ml-3">
-              <h4 className="text-sm font-medium text-yellow-800">
-                Special Dietary Considerations
-              </h4>
-              <ul className="mt-1 text-sm text-yellow-700 list-disc list-inside">
-              {petInfo.healthIssues.map(issue => (
-                  <li key={issue} className="ml-4">
-                    {issue === 'Weight management' && 'Reduced portion sizes and low-fat options'}
-                    {issue === 'Joint problems' && 'Added supplements for joint health'}
-                    {issue === 'Allergies' && 'Hypoallergenic ingredients only'}
-                    {issue === 'Digestive issues' && 'Easy-to-digest ingredients and smaller portions'}
-                  </li>
-                ))}
-              </ul>
-            </div>
+        {/* Nutrition Tips */}
+        <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden">
+          <h2 className="text-xl font-semibold text-blue-500 p-6 pb-4">
+            Nutrition Tips
+          </h2>
+          <div className="p-6 pt-0 space-y-4">
+            {[
+              "Drink at least 8 glasses of water daily",
+              "Include a variety of colorful vegetables in your meals",
+              "Choose lean proteins like fish, chicken, and legumes",
+              "Limit processed foods and added sugars"
+            ].map((tip, index) => (
+                <div key={index} className="flex items-start">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5 mr-3">
+                    <CheckCircle className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <p className="text-gray-600">{tip}</p>
+                </div>
+            ))}
           </div>
-        )}
-
-        {/* 膳食时间表 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {dietPlan.meals.map(meal => (
-            <MealCard key={meal.name} meal={meal} />
-          ))}
         </div>
+
+        {/* Modals */}
+        {editingMeal && <EditForm />}
       </div>
-
-      {/* 选中餐食的详细信息 */}
-      {selectedMeal && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {selectedMeal.name} Details
-            </h3>
-            <span className="text-sm text-gray-500">{selectedMeal.time}</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Ingredients</h4>
-              <ul className="space-y-2">
-                {selectedMeal.ingredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <Apple className="h-4 w-4 mr-2 text-green-500" />
-                    <span>{ingredient.name}</span>
-                    <span className="ml-2 text-sm text-gray-500">
-                      ({ingredient.amount})
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
-                Nutritional Information
-              </h4>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Calories</span>
-                  <span className="font-medium">{selectedMeal.calories} kcal</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Protein</span>
-                  <span className="font-medium">
-                    {Math.round(selectedMeal.calories * 0.3 / 4)}g
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Carbs</span>
-                  <span className="font-medium">
-                    {Math.round(selectedMeal.calories * 0.4 / 4)}g
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Fats</span>
-                  <span className="font-medium">
-                    {Math.round(selectedMeal.calories * 0.3 / 9)}g
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-start">
-              <Info className="h-5 w-5 text-blue-500 mt-0.5" />
-              <div className="ml-3">
-                <h4 className="text-sm font-medium text-blue-800">
-                  Feeding Instructions
-                </h4>
-                <p className="mt-1 text-sm text-blue-700">
-                  Serve at room temperature. Ensure fresh water is always available.
-                  Monitor your pet's response to the meal and adjust portions if needed.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
   );
 };
 

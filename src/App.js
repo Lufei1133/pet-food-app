@@ -1,10 +1,8 @@
-// ./src/App.js
 import React, {useState} from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Login from './components/Auth/Login';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
-
 
 // 导入现有组件
 import HealthDashboard from './components/health/HealthDashboard';
@@ -12,6 +10,9 @@ import PetShop from './components/shop/PetShop';
 import AiDoctor from './components/AI-Vet/AiDoctor';
 import PetSocial from './components/Social/Social';
 import AccountProfile from './components/profile/AccountProfile';
+import ExercisePlan from './components/health/ExercisePlan';
+import DietRecommendation from './components/health/DietRecommendation';
+import MedicalRecords from './components/health/MedicalRecords';
 import AuthService from './services/auth';
 import {useNavigate} from "react-router-dom";
 
@@ -29,8 +30,8 @@ function App() {
         />
       </Routes>
   );
-
 }
+
 function MainContent() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('shop');
@@ -44,7 +45,6 @@ function MainContent() {
     healthIssues: ['Joint problems']
   });
   const [user, setUser] = useState(AuthService.getCurrentUser());
-
 
   const renderContent = () => {
     switch (activeTab) {
@@ -66,7 +66,7 @@ function MainContent() {
   const handleLogout = () => {
     AuthService.logout();
     setUser(null);
-    navigate('/login', { replace: true });  // 添加导航到登录页
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -77,7 +77,12 @@ function MainContent() {
           onTabChange={setActiveTab}
           onLogout={handleLogout}
       >
-        {renderContent()}
+        <Routes>
+          <Route path="/" element={renderContent()} />
+          <Route path="/exercise-plan" element={<ExercisePlan petInfo={petInfo} />} />
+          <Route path="/diet-recommendation" element={<DietRecommendation petInfo={petInfo} />} />
+          <Route path="/medical-records" element={<MedicalRecords petInfo={petInfo} />} />
+        </Routes>
       </MainLayout>
   );
 }
